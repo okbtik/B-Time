@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B-Time — Minimalist Chess, Xiangqi & Shogi</title>
+  <meta name="description"
+    content="A clean, minimalist local 2-player platform for Chess, Xiangqi (Chinese Chess), and Shogi (Japanese Chess).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Serif+JP:wght@600;700&family=Noto+Serif+SC:wght@600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Header & Navigation -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-symbol">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">B-Time</span>
+          <span class="brand-subtitle">Tabletop Classics</span>
+        </div>
+      </div>
+
+      <!-- Game Selector Tabs -->
+      <nav class="game-nav" aria-label="Game Selection">
+        <button type="button" class="tab-btn active" data-game="chess" id="tab-chess">
+          <span class="tab-icon">♟</span>
+          <span class="tab-label">Chess</span>
+        </button>
+        <button type="button" class="tab-btn" data-game="xiangqi" id="tab-xiangqi">
+          <span class="tab-icon">帥</span>
+          <span class="tab-label">Xiangqi</span>
+        </button>
+        <button type="button" class="tab-btn" data-game="shogi" id="tab-shogi">
+          <span class="tab-icon">王</span>
+          <span class="tab-label">Shogi</span>
+        </button>
+      </nav>
+
+      <!-- Global Actions -->
+      <div class="header-actions">
+        <button type="button" class="icon-btn" id="btn-sound" title="Toggle Sound (Mute/Unmute)"
+          aria-label="Toggle Sound">
+          <svg id="sound-icon-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg id="sound-icon-off" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+            <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+        </button>
+        <button type="button" class="icon-btn" id="btn-rules" title="Game Rules & Guide" aria-label="Game Rules">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Game Viewport -->
+    <main class="game-viewport">
+      <!-- Game Control Bar (Shared Across All Games) -->
+      <section class="game-meta-bar">
+        <div class="status-panel">
+          <div class="turn-badge" id="turn-badge">
+            <span class="turn-dot" id="turn-dot"></span>
+            <span class="turn-text" id="turn-text">White to move</span>
+          </div>
+          <div class="game-state-notice" id="game-state-notice" aria-live="polite"></div>
+        </div>
+
+        <div class="game-controls">
+          <button type="button" class="action-btn" id="btn-undo" title="Undo last move">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+            <span>Undo</span>
+          </button>
+          <button type="button" class="action-btn" id="btn-flip" title="Flip board perspective">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+            <span>Flip</span>
+          </button>
+          <button type="button" class="action-btn restart-btn" id="btn-restart" title="Start a fresh match">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            <span>New Game</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Active Game Boards Container -->
+      <section class="boards-wrapper">
+        <!-- 1. CHESS CONTAINER -->
+        <div id="game-chess-container" class="game-container active">
+          <div class="chess-layout">
+            <!-- Captured White Pieces (captured by Black) -->
+            <div class="capture-strip top" id="chess-captured-white"></div>
+
+            <div class="board-frame">
+              <div class="chess-board" id="chess-board" role="grid" aria-label="Chess Board">
+                <!-- 64 squares generated dynamically -->
+              </div>
+            </div>
+
+            <!-- Captured Black Pieces (captured by White) -->
+            <div class="capture-strip bottom" id="chess-captured-black"></div>
+          </div>
+        </div>
+
+        <!-- 2. XIANGQI CONTAINER -->
+        <div id="game-xiangqi-container" class="game-container">
+          <div class="xiangqi-layout">
+            <div class="capture-strip top" id="xiangqi-captured-red"></div>
+
+            <div class="board-frame xiangqi-frame">
+              <div class="xiangqi-board" id="xiangqi-board" role="grid" aria-label="Xiangqi Board">
+                <!-- SVG Canvas Board grid overlay + 90 intersection points -->
+                <svg class="xiangqi-svg-lines" viewBox="0 0 450 500" preserveAspectRatio="none">
+                  <!-- Outer Border -->
+                  <rect x="25" y="25" width="400" height="450" class="xq-line-outer" />
+
+                  <!-- Horizontal lines (10 rows, y = 25 + r*50) -->
+                  <line x1="25" y1="25" x2="425" y2="25" class="xq-line" />
+                  <line x1="25" y1="75" x2="425" y2="75" class="xq-line" />
+                  <line x1="25" y1="125" x2="425" y2="125" class="xq-line" />
+                  <line x1="25" y1="175" x2="425" y2="175" class="xq-line" />
+                  <line x1="25" y1="225" x2="425" y2="225" class="xq-line" />
+                  <!-- River gap between y=225 and y=275 -->
+                  <line x1="25" y1="275" x2="425" y2="275" class="xq-line" />
+                  <line x1="25" y1="325" x2="425" y2="325" class="xq-line" />
+                  <line x1="25" y1="375" x2="425" y2="375" class="xq-line" />
+                  <line x1="25" y1="425" x2="425" y2="425" class="xq-line" />
+                  <line x1="25" y1="475" x2="425" y2="475" class="xq-line" />
+
+                  <!-- Vertical lines (9 columns, x = 25 + c*50) -->
+                  <!-- Left & right borders span full board -->
+                  <line x1="25" y1="25" x2="25" y2="475" class="xq-line" />
+                  <line x1="425" y1="25" x2="425" y2="475" class="xq-line" />
+                  <!-- Inner verticals break at the river -->
+                  <!-- Top territory (rows 0 to 4) -->
+                  <line x1="75" y1="25" x2="75" y2="225" class="xq-line" />
+                  <line x1="125" y1="25" x2="125" y2="225" class="xq-line" />
+                  <line x1="175" y1="25" x2="175" y2="225" class="xq-line" />
+                  <line x1="225" y1="25" x2="225" y2="225" class="xq-line" />
+                  <line x1="275" y1="25" x2="275" y2="225" class="xq-line" />
+                  <line x1="325" y1="25" x2="325" y2="225" class="xq-line" />
+                  <line x1="375" y1="25" x2="375" y2="225" class="xq-line" />
+
+                  <!-- Bottom territory (rows 5 to 9) -->
+                  <line x1="75" y1="275" x2="75" y2="475" class="xq-line" />
+                  <line x1="125" y1="275" x2="125" y2="475" class="xq-line" />
+                  <line x1="175" y1="275" x2="175" y2="475" class="xq-line" />
+                  <line x1="225" y1="275" x2="225" y2="475" class="xq-line" />
+                  <line x1="275" y1="275" x2="275" y2="475" class="xq-line" />
+                  <line x1="325" y1="275" x2="325" y2="475" class="xq-line" />
+                  <line x1="375" y1="275" x2="375" y2="475" class="xq-line" />
+
+                  <!-- Nine Palace Diagonals (Top: cols 3-5, rows 0-2; x:175-275, y:25-125) -->
+                  <line x1="175" y1="25" x2="275" y2="125" class="xq-diagonal" />
+                  <line x1="275" y1="25" x2="175" y2="125" class="xq-diagonal" />
+
+                  <!-- Nine Palace Diagonals (Bottom: cols 3-5, rows 7-9; x:175-275, y:375-475) -->
+                  <line x1="175" y1="375" x2="275" y2="475" class="xq-diagonal" />
+                  <line x1="275" y1="375" x2="175" y2="475" class="xq-diagonal" />
+
+                  <!-- River Text -->
+                  <text x="125" y="255" class="xq-river-text">楚 河</text>
+                  <text x="325" y="255" class="xq-river-text">漢 界</text>
+                </svg>
+
+                <!-- Intersection nodes container (90 spots) -->
+                <div class="xiangqi-grid" id="xiangqi-grid"></div>
+              </div>
+            </div>
+
+            <div class="capture-strip bottom" id="xiangqi-captured-black"></div>
+          </div>
+        </div>
+
+        <!-- 3. SHOGI CONTAINER -->
+        <div id="game-shogi-container" class="game-container">
+          <div class="shogi-layout">
+            <!-- Gote (White/Top) Komadai (Captured pieces stand) -->
+            <div class="komadai-panel top-komadai">
+              <div class="komadai-header">
+                <span class="komadai-title">Gote (後手)</span>
+                <span class="komadai-badge" id="shogi-gote-count">0</span>
+              </div>
+              <div class="komadai-slots" id="shogi-stand-gote"></div>
+            </div>
+
+            <div class="board-frame shogi-frame">
+              <div class="shogi-board" id="shogi-board" role="grid" aria-label="Shogi Board">
+                <!-- 81 squares generated dynamically (9x9) -->
+              </div>
+            </div>
+
+            <!-- Sente (Black/Bottom) Komadai (Captured pieces stand) -->
+            <div class="komadai-panel bottom-komadai">
+              <div class="komadai-header">
+                <span class="komadai-title">Sente (先手)</span>
+                <span class="komadai-badge" id="shogi-sente-count">0</span>
+              </div>
+              <div class="komadai-slots" id="shogi-stand-sente"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Move History / Footer details -->
+      <footer class="app-footer">
+        <div class="move-log" id="move-log" aria-live="polite">
+          <span class="log-label">Last Move:</span>
+          <span class="log-value" id="last-move-desc">Game started. Ready for first move.</span>
+        </div>
+        <div class="mode-info">
+          <span>Local 2-Player</span>
+          <span class="divider">•</span>
+          <span>Unlimited Time</span>
+        </div>
+      </footer>
+    </main>
+
+    <!-- PROMOTION MODAL (Shared / Customized for Chess & Shogi) -->
+    <div class="modal-overlay hidden" id="promotion-modal">
+      <div class="modal-card">
+        <h3 class="modal-title" id="modal-promo-title">Pawn Promotion</h3>
+        <p class="modal-subtitle" id="modal-promo-subtitle">Choose the piece you want to promote to:</p>
+        <div class="promo-options" id="promo-options">
+          <!-- Dynamically populated buttons -->
+        </div>
+      </div>
+    </div>
+
+    <!-- RULES & HELP MODAL -->
+    <div class="modal-overlay hidden" id="rules-modal">
+      <div class="modal-card rules-card">
+        <div class="rules-header">
+          <h3 class="modal-title">Rules & Controls</h3>
+          <button type="button" class="close-btn" id="btn-close-rules" aria-label="Close Rules Modal">✕</button>
+        </div>
+        <div class="rules-body">
+          <section class="rules-section">
+            <h4>🎮 Local 2-Player Controls</h4>
+            <p><strong>Touch/Click to select</strong> a piece, then tap any highlighted dot to make a move. Click on an
+              already selected piece to deselect it.</p>
+            <p><strong>Flip Button:</strong> Rotates the board 180 degrees so you and your friend can pass the device or
+              play sitting across each other.</p>
+            <p><strong>Undo Button:</strong> Step back any accidental misplay during casual breaks.</p>
+          </section>
+
+          <section class="rules-section">
+            <h4>♟ Chess</h4>
+            <p>Traditional 8×8 battlefield. Pawns move forward 1 square (or 2 on their initial move) and capture
+              diagonally. Castling and pawn promotion are supported. Checkmate the opposing King to win!</p>
+          </section>
+
+          <section class="rules-section">
+            <h4>帥 Xiangqi (Chinese Chess)</h4>
+            <p>Played on the 9×10 intersections. The <strong>General (帥/將)</strong> and <strong>Advisors (仕/士)</strong>
+              must stay within their 3×3 Nine Palace. <strong>Elephants (相/象)</strong> cannot cross the central River
+              and can be blocked by adjacent pieces. <strong>Horses (傌/馬)</strong> step one point orthogonally and one
+              diagonally, subject to blocking. <strong>Cannons (炮/砲)</strong> jump exactly one piece to capture.
+              <strong>Soldiers (兵/卒)</strong> gain horizontal movement after crossing the river.
+            </p>
+          </section>
+
+          <section class="rules-section">
+            <h4>王 Shogi (Japanese Chess)</h4>
+            <p>Played on a 9×9 grid. Pieces you capture from your opponent are added to your <em>Komadai</em> (hand
+              reserve) and can be dropped back onto any empty square as your own! Pieces can promote upon reaching the
+              enemy's 3-row camp. (Special restrictions: Two pawns in the same file / <em>Nifu</em> and dropping a pawn
+              to checkmate / <em>Uchifuzume</em> are illegal).</p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Synthesizer & Game Scripts -->
+  <script src="js/chess.js"></script>
+  <script src="js/xiangqi.js"></script>
+  <script src="js/shogi.js"></script>
+  <script>
+    // Audio synthesizer for crisp, satisfying mechanical board clicks
+    const SoundFx = (() => {
+      let audioCtx = null;
+      let isMuted = false;
+
+      function getContext() {
+        if (!audioCtx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) audioCtx = new AudioContext();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        return audioCtx;
+      }
+
+      return {
+        toggleMute() {
+          isMuted = !isMuted;
+          const onIcon = document.getElementById('sound-icon-on');
+          const offIcon = document.getElementById('sound-icon-off');
+          if (onIcon && offIcon) {
+            onIcon.classList.toggle('hidden', isMuted);
+            offIcon.classList.toggle('hidden', !isMuted);
+          }
+          return isMuted;
+        },
+        playMove() {
+          if (isMuted) return;
+          try {
+            const ctx = getContext();
+            if (!ctx) return;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + 0.06);
+            gain.gain.setValueAtTime(0.25, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.06);
+          } catch (e) { }
+        },
+        playCapture() {
+          if (isMuted) return;
+          try {
+            const ctx = getContext();
+            if (!ctx) return;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(600, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.35, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.12);
+          } catch (e) { }
+        },
+        playCheck() {
+          if (isMuted) return;
+          try {
+            const ctx = getContext();
+            if (!ctx) return;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(520, ctx.currentTime);
+            osc.frequency.setValueAtTime(680, ctx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.22);
+          } catch (e) { }
+        }
+      };
+    })();
+
+    // Application Coordinator
+    document.addEventListener('DOMContentLoaded', () => {
+      let currentGame = 'chess';
+      let isFlipped = false;
+
+      // Initialize all 3 games
+      if (window.ChessGame) window.ChessGame.init();
+      if (window.XiangqiGame) window.XiangqiGame.init();
+      if (window.ShogiGame) window.ShogiGame.init();
+
+      // Tab switcher
+      const tabs = document.querySelectorAll('.game-nav .tab-btn');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const game = tab.dataset.game;
+          if (game === currentGame) return;
+          switchGame(game);
+        });
+      });
+
+      function switchGame(game) {
+        currentGame = game;
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.game === game));
+
+        document.querySelectorAll('.game-container').forEach(c => {
+          c.classList.remove('active');
+        });
+        const targetContainer = document.getElementById(`game-${game}-container`);
+        if (targetContainer) targetContainer.classList.add('active');
+
+        // Apply flip state if active
+        syncFlipState();
+
+        // Update active game status in meta bar
+        updateActiveGameMeta();
+      }
+
+      function getActiveGameInstance() {
+        if (currentGame === 'chess') return window.ChessGame;
+        if (currentGame === 'xiangqi') return window.XiangqiGame;
+        if (currentGame === 'shogi') return window.ShogiGame;
+        return null;
+      }
+
+      function updateActiveGameMeta() {
+        const game = getActiveGameInstance();
+        if (game && game.updateMetaDisplay) {
+          game.updateMetaDisplay();
+        }
+      }
+
+      // Undo button
+      document.getElementById('btn-undo').addEventListener('click', () => {
+        const game = getActiveGameInstance();
+        if (game && game.undo) game.undo();
+      });
+
+      // Flip button
+      document.getElementById('btn-flip').addEventListener('click', () => {
+        isFlipped = !isFlipped;
+        syncFlipState();
+      });
+
+      function syncFlipState() {
+        const chessFrame = document.querySelector('.chess-layout');
+        const xiangqiFrame = document.querySelector('.xiangqi-layout');
+        const shogiFrame = document.querySelector('.shogi-layout');
+
+        [chessFrame, xiangqiFrame, shogiFrame].forEach(frame => {
+          if (frame) frame.classList.toggle('flipped', isFlipped);
+        });
+
+        const flipBtn = document.getElementById('btn-flip');
+        if (flipBtn) flipBtn.classList.toggle('active-flip', isFlipped);
+      }
+
+      // Restart button
+      document.getElementById('btn-restart').addEventListener('click', () => {
+        const game = getActiveGameInstance();
+        if (game && game.restart) {
+          if (confirm('Start a new game? Current board progress will be reset.')) {
+            game.restart();
+          }
+        }
+      });
+
+      // Sound button
+      document.getElementById('btn-sound').addEventListener('click', () => {
+        SoundFx.toggleMute();
+      });
+
+      // Rules modal
+      const rulesModal = document.getElementById('rules-modal');
+      document.getElementById('btn-rules').addEventListener('click', () => {
+        rulesModal.classList.remove('hidden');
+      });
+      document.getElementById('btn-close-rules').addEventListener('click', () => {
+        rulesModal.classList.add('hidden');
+      });
+      rulesModal.addEventListener('click', (e) => {
+        if (e.target === rulesModal) rulesModal.classList.add('hidden');
+      });
+
+      // Keyboard shortcuts: 'u' for undo, 'f' for flip, 'r' for restart, 'Escape' for modals
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          rulesModal.classList.add('hidden');
+          const promoModal = document.getElementById('promotion-modal');
+          if (promoModal) promoModal.classList.add('hidden');
+        }
+      });
+
+      // Initial meta update
+      updateActiveGameMeta();
+    });
+  </script>
+</body>
+
+</html>

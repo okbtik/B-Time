@@ -1,0 +1,1098 @@
+/* ==========================================================================
+   B-Time Minimalist Design System
+   White-based, clean, high-precision aesthetic for Chess, Xiangqi & Shogi
+   ========================================================================== */
+
+:root {
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-hover: #e2e8f0;
+
+  --border-light: #e2e8f0;
+  --border-strong: #cbd5e1;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  --color-accent: #2563eb;
+  --color-accent-soft: #eff6ff;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-success: #16a34a;
+
+  /* Chess Palette */
+  --chess-sq-light: #ffffff;
+  --chess-sq-dark: #f1f5f9;
+  --chess-move-dot: rgba(37, 99, 235, 0.45);
+  --chess-capture-ring: rgba(220, 38, 38, 0.5);
+  --chess-last-move: rgba(254, 240, 138, 0.55);
+  --chess-check: rgba(239, 68, 68, 0.35);
+
+  /* Xiangqi Palette */
+  --xq-board-bg: #fffdfa;
+  --xq-line-color: #64748b;
+  --xq-red-piece: #dc2626;
+  --xq-black-piece: #1e293b;
+  --xq-piece-bg: #ffffff;
+  --xq-piece-border: #94a3b8;
+
+  /* Shogi Palette */
+  --shogi-board-bg: #fffefb;
+  --shogi-line-color: #94a3b8;
+  --shogi-piece-bg: #ffffff;
+  --shogi-piece-border: #64748b;
+  --shogi-promoted-color: #dc2626;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-cjk: 'Noto Serif JP', 'Noto Serif SC', 'Songti SC', 'Source Han Serif', serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow-x: hidden;
+}
+
+/* App Container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1080px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 12px 16px;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-symbol {
+  width: 36px;
+  height: 36px;
+  background: var(--text-primary);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+
+.brand-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Game Navigation Tabs */
+.game-nav {
+  display: flex;
+  background: var(--bg-subtle);
+  padding: 4px;
+  border-radius: var(--radius-full);
+  gap: 4px;
+  border: 1px solid var(--border-light);
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-btn {
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+/* Viewport & Controls */
+.game-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 14px 18px;
+}
+
+/* Meta Bar (Status & Buttons) */
+.game-meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 14px;
+}
+
+.status-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.turn-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-light);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+}
+
+.turn-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #0f172a;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1);
+  transition: all 0.2s ease;
+}
+
+.turn-dot.black-turn {
+  background: #0f172a;
+}
+
+.turn-dot.red-turn {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.turn-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.game-state-notice {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+  display: none;
+}
+
+.game-state-notice.show {
+  display: inline-block;
+  animation: pulse-notice 2s infinite ease-in-out;
+}
+
+@keyframes pulse-notice {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+.game-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.action-btn.active-flip {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.action-btn.restart-btn:hover {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+/* Boards Wrapper */
+.boards-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  min-height: 480px;
+}
+
+.game-container {
+  display: none;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.game-container.active {
+  display: block;
+}
+
+/* Captured Pieces Strips (Chess & Xiangqi) */
+.capture-strip {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  overflow-x: auto;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+}
+
+.capture-strip.bottom {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+.cap-piece {
+  font-size: 1.15rem;
+  line-height: 1;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+}
+
+.cap-piece.red {
+  color: var(--color-danger);
+}
+
+/* ==========================================================================
+   1. CHESS BOARD
+   ========================================================================== */
+.chess-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.board-frame {
+  background: #ffffff;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.chess-board {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  width: min(82vw, 480px);
+  height: min(82vw, 480px);
+  border: 1px solid var(--border-strong);
+  position: relative;
+}
+
+.chess-sq {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.chess-sq.light {
+  background-color: var(--chess-sq-light);
+}
+
+.chess-sq.dark {
+  background-color: var(--chess-sq-dark);
+}
+
+.chess-sq.selected {
+  background-color: #dbeafe !important;
+}
+
+.chess-sq.last-move {
+  background-color: var(--chess-last-move) !important;
+}
+
+.chess-sq.in-check {
+  background-color: var(--chess-check) !important;
+}
+
+/* Chess Move Hint Dot */
+.chess-sq .move-hint {
+  width: 14px;
+  height: 14px;
+  background-color: var(--chess-move-dot);
+  border-radius: 50%;
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.chess-sq .capture-hint {
+  width: 80%;
+  height: 80%;
+  border: 3.5px solid var(--chess-capture-ring);
+  border-radius: 50%;
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Chess SVG Piece Styling */
+.chess-piece {
+  width: 78%;
+  height: 78%;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.12s ease;
+  pointer-events: none;
+}
+
+.chess-piece svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.chess-sq:hover .chess-piece {
+  transform: scale(1.06);
+}
+
+/* ==========================================================================
+   2. XIANGQI (CHINESE CHESS) BOARD
+   ========================================================================== */
+.xiangqi-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.xiangqi-frame {
+  padding: 6px;
+}
+
+.xiangqi-board {
+  position: relative;
+  width: min(82vw, 450px);
+  height: min(91vw, 500px);
+  background-color: var(--xq-board-bg);
+  border: 1px solid var(--border-strong);
+}
+
+.xiangqi-svg-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.xq-line-outer {
+  fill: none;
+  stroke: var(--xq-line-color);
+  stroke-width: 2.2;
+}
+
+.xq-line {
+  stroke: var(--xq-line-color);
+  stroke-width: 1.2;
+}
+
+.xq-diagonal {
+  stroke: var(--xq-line-color);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 2;
+}
+
+.xq-river-text {
+  font-family: var(--font-cjk);
+  font-size: 18px;
+  font-weight: 700;
+  fill: #94a3b8;
+  letter-spacing: 12px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.xiangqi-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+}
+
+.xq-point {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.xq-piece {
+  width: 82%;
+  height: 82%;
+  max-width: 44px;
+  max-height: 44px;
+  border-radius: 50%;
+  background: var(--xq-piece-bg);
+  border: 2px solid var(--xq-piece-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-cjk);
+  font-size: clamp(14px, 3.4vw, 20px);
+  font-weight: 700;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.12s ease;
+}
+
+.xq-point:hover .xq-piece {
+  transform: scale(1.08);
+}
+
+.xq-piece.red {
+  color: var(--xq-red-piece);
+  border-color: #fca5a5;
+  box-shadow: 0 2px 5px rgba(220, 38, 38, 0.15);
+}
+
+.xq-piece.black {
+  color: var(--xq-black-piece);
+  border-color: #94a3b8;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.15);
+}
+
+.xq-point.selected .xq-piece {
+  transform: scale(1.12);
+  outline: 2.5px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.xq-point.last-move .xq-piece {
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.6);
+}
+
+.xq-point.in-check .xq-piece {
+  animation: check-pulse 1s infinite alternate;
+}
+
+@keyframes check-pulse {
+  from { box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.5); }
+  to { box-shadow: 0 0 0 7px rgba(220, 38, 38, 0.2); }
+}
+
+.xq-point .move-hint {
+  width: 12px;
+  height: 12px;
+  background-color: var(--chess-move-dot);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.xq-point .capture-hint {
+  width: 34px;
+  height: 34px;
+  border: 2.5px solid var(--chess-capture-ring);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ==========================================================================
+   3. SHOGI (JAPANESE CHESS) BOARD
+   ========================================================================== */
+.shogi-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.shogi-frame {
+  padding: 6px;
+}
+
+.shogi-board {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+  width: min(84vw, 460px);
+  height: min(84vw, 460px);
+  background-color: var(--shogi-board-bg);
+  border: 1.5px solid var(--border-strong);
+}
+
+.shogi-sq {
+  width: 100%;
+  height: 100%;
+  border-right: 1px solid var(--shogi-line-color);
+  border-bottom: 1px solid var(--shogi-line-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.shogi-sq:nth-child(9n) {
+  border-right: none;
+}
+
+.shogi-sq:nth-last-child(-n+9) {
+  border-bottom: none;
+}
+
+.shogi-sq.star-point::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  bottom: -2.5px;
+  right: -2.5px;
+  z-index: 4;
+}
+
+.shogi-sq.selected {
+  background-color: #dbeafe !important;
+}
+
+.shogi-sq.last-move {
+  background-color: var(--chess-last-move) !important;
+}
+
+.shogi-sq.in-check {
+  background-color: var(--chess-check) !important;
+}
+
+.shogi-sq .move-hint {
+  width: 12px;
+  height: 12px;
+  background-color: var(--chess-move-dot);
+  border-radius: 50%;
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.shogi-sq .capture-hint {
+  width: 78%;
+  height: 78%;
+  border: 3px solid var(--chess-capture-ring);
+  border-radius: 50%;
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Shogi Traditional Piece Shape (Pentagonal Badge) */
+.shogi-piece {
+  width: 84%;
+  height: 88%;
+  max-width: 42px;
+  max-height: 46px;
+  background: var(--shogi-piece-bg);
+  border: 1.5px solid var(--shogi-piece-border);
+  clip-path: polygon(50% 0%, 100% 24%, 85% 100%, 15% 100%, 0% 24%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-cjk);
+  font-size: clamp(14px, 3.2vw, 19px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 2;
+  transition: transform 0.15s ease;
+  user-select: none;
+}
+
+/* Gote's pieces face down towards Sente */
+.shogi-piece.gote {
+  transform: rotate(180deg);
+}
+
+.shogi-piece.promoted {
+  color: var(--shogi-promoted-color);
+  font-weight: 700;
+}
+
+/* Komadai (Shogi Piece Stands) */
+.komadai-panel {
+  width: min(84vw, 460px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 6px 12px;
+  gap: 12px;
+}
+
+.komadai-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.komadai-badge {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+}
+
+.komadai-slots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  flex: 1;
+  justify-content: flex-end;
+  min-height: 36px;
+}
+
+.komadai-piece-slot {
+  position: relative;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.12s ease;
+}
+
+.komadai-piece-slot:hover {
+  transform: translateY(-2px);
+}
+
+.komadai-piece-slot.selected {
+  outline: 2px solid var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.komadai-piece-slot .shogi-piece {
+  width: 32px;
+  height: 35px;
+  font-size: 15px;
+}
+
+.komadai-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--text-primary);
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+/* ==========================================================================
+   FLIP VIEW (180 Rotation for Head-to-Head play)
+   ========================================================================== */
+.chess-layout.flipped .chess-board {
+  transform: rotate(180deg);
+}
+
+.chess-layout.flipped .chess-piece {
+  transform: rotate(180deg);
+}
+
+.xiangqi-layout.flipped .xiangqi-board {
+  transform: rotate(180deg);
+}
+
+.xiangqi-layout.flipped .xq-piece {
+  transform: rotate(180deg);
+}
+
+.shogi-layout.flipped .shogi-board {
+  transform: rotate(180deg);
+}
+
+.shogi-layout.flipped .shogi-piece {
+  transform: rotate(180deg);
+}
+
+.shogi-layout.flipped .shogi-piece.gote {
+  transform: rotate(0deg);
+}
+
+/* Footer Move Log */
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-light);
+  margin-top: 14px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.move-log {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.log-label {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.log-value {
+  font-family: monospace;
+  background: var(--bg-subtle);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+}
+
+.mode-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+}
+
+.divider {
+  opacity: 0.5;
+}
+
+/* ==========================================================================
+   MODALS (Promotion & Rules)
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+  transition: opacity 0.2s ease;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+  max-width: 440px;
+  width: 100%;
+  animation: modal-enter 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.modal-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 18px;
+}
+
+.promo-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 10px;
+}
+
+.promo-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 12px 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.promo-btn:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+
+.promo-btn-piece {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.promo-btn-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Rules Modal */
+.rules-card {
+  max-width: 580px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px;
+}
+
+.rules-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 16px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.close-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-subtle);
+}
+
+.rules-body {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-right: 4px;
+}
+
+.rules-section h4 {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.rules-section p {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .app-container {
+    padding: 8px;
+  }
+  .app-header {
+    flex-wrap: wrap;
+    padding: 10px 12px;
+  }
+  .brand {
+    order: 1;
+  }
+  .header-actions {
+    order: 2;
+  }
+  .game-nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+  .game-meta-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .status-panel {
+    justify-content: space-between;
+  }
+  .game-controls {
+    justify-content: center;
+  }
+  .app-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
