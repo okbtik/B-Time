@@ -2,7 +2,6 @@
  * B-Time — Shogi (Japanese Chess) Engine & UI Controller
  * 9x9 Local 2-Player Shogi with piece drops, promotions, and anti-nifu
  */
-
 window.ShogiGame = (() => {
   const ROWS = 9;
   const COLS = 9;
@@ -92,6 +91,49 @@ window.ShogiGame = (() => {
     return side === 'sente' ? row <= 2 : row >= 6;
   }
 
+  function getShogiPieceSVG(pieceKey) {
+    if (!pieceKey) return '';
+
+    const side = getSide(pieceKey);
+    const promo = isPromoted(pieceKey);
+    const kanji = KANJI[pieceKey] || pieceKey;
+    const isGote = side === 'gote';
+
+    // 文字色：成駒は赤い文字、通常の駒は濃い墨色
+    const textColor = promo ? '#dc2626' : '#1e1b18';
+
+    // 後手（Gote）の場合は五角形と文字を180度回転
+    const transform = isGote ? 'transform="rotate(180 20 22.5)"' : '';
+
+    return `
+      <div class="shogi-piece">
+        <svg viewBox="0 0 40 45">
+          <g ${transform}>
+            <!-- 五角形の外枠・グラデーション背景 -->
+            <polygon points="20,2 38,12 32,43 8,43 2,12" 
+                     fill="#fffefb" 
+                     stroke="#475569" 
+                     stroke-width="1.8" 
+                     stroke-linejoin="round" />
+            <!-- 内側の面取り・立体感ライン -->
+            <polygon points="20,4.5 36,13 30.5,41.5 9.5,41.5 4,13" 
+                     fill="none" 
+                     stroke="#cbd5e1" 
+                     stroke-width="0.8" />
+            <!-- 駒の文字 -->
+            <text x="20" y="27" 
+                  font-family="'Noto Serif JP', 'Source Han Serif', serif" 
+                  font-size="17" 
+                  font-weight="700" 
+                  fill="${textColor}" 
+                  text-anchor="middle" 
+                  dominant-baseline="middle">${kanji}</text>
+          </g>
+        </svg>
+      </div>
+    `;
+  }
+
   // Gold move offsets relative to forward direction
   // Forward: dr = -1 for Sente, dr = 1 for Gote
   function getGoldOffsets(forward) {
@@ -138,8 +180,8 @@ window.ShogiGame = (() => {
     if (base === 'K') {
       const offsets = [
         [-1, -1], [-1, 0], [-1, 1],
-        [0, -1],           [0, 1],
-        [1, -1],  [1, 0],  [1, 1]
+        [0, -1], [0, 1],
+        [1, -1], [1, 0], [1, 1]
       ];
       for (const [dr, dc] of offsets) tryAdd(r + dr, c + dc);
     } else if (base === 'R') {
@@ -625,16 +667,10 @@ window.ShogiGame = (() => {
 
     const checkKing = isKingInCheck(board, currentTurn) ? findKing(board, currentTurn) : null;
 
-    // Star points on Shogi board: (2,2), (2,6), (6,2), (6,6)
-    const starPoints = new Set(['2,2', '2,6', '6,2', '6,6']);
-
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         const sq = document.createElement('div');
         sq.className = 'shogi-sq';
-        if (starPoints.has(`${r},${c}`)) {
-          sq.classList.add('star-point');
-        }
 
         if (selectedSquare && selectedSquare.r === r && selectedSquare.c === c) {
           sq.classList.add('selected');
@@ -650,12 +686,9 @@ window.ShogiGame = (() => {
 
         const piece = board[r][c];
         if (piece) {
-          const pieceEl = document.createElement('div');
-          const side = getSide(piece);
-          const promo = isPromoted(piece);
-          pieceEl.className = `shogi-piece ${side === 'gote' ? 'gote' : ''} ${promo ? 'promoted' : ''}`;
-          pieceEl.textContent = KANJI[piece] || piece;
-          sq.appendChild(pieceEl);
+          const pieceWrapper = document.createElement('div');
+          pieceWrapper.innerHTML = getShogiPieceSVG(piece);
+          sq.appendChild(pieceWrapper.firstElementChild);
         }
 
         const legalMove = legalMoves.find(m => m.r === r && m.c === c);
@@ -694,7 +727,7 @@ window.ShogiGame = (() => {
             slot.classList.add('selected');
           }
           slot.innerHTML = `
-            <div class="shogi-piece">${KANJI[key] || key}</div>
+            ${getShogiPieceSVG(key)}
             ${count > 1 ? `<span class="komadai-count">${count}</span>` : ''}
           `;
           slot.addEventListener('click', () => onHandPieceClick(key, 'sente'));
@@ -715,7 +748,7 @@ window.ShogiGame = (() => {
             slot.classList.add('selected');
           }
           slot.innerHTML = `
-            <div class="shogi-piece gote">${KANJI[key.toUpperCase()] || key}</div>
+            ${getShogiPieceSVG(key.toLowerCase())}
             ${count > 1 ? `<span class="komadai-count">${count}</span>` : ''}
           `;
           slot.addEventListener('click', () => onHandPieceClick(key, 'gote'));
