@@ -141,6 +141,21 @@ body {
   font-weight: 500;
 }
 
+/* 非表示用クラス (アイコンの重複を防ぐ) */
+.hidden {
+  display: none !important;
+}
+
+/* 音声ボタンのスタイル調整 */
+#btn-sound {
+  position: relative;
+}
+
+#btn-sound svg {
+  display: block;
+  transition: opacity 0.15s ease;
+}
+
 /* Game Navigation Tabs */
 .game-nav {
   display: flex;
