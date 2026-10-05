@@ -46,7 +46,39 @@ window.ShogiGame = (() => {
   let history = []; // Undo stack
   let lastMove = null; // { from: {r,c}|'drop', to: {r,c}, piece }
   let isGameOver = false;
+  const STORAGE_KEY = 'btime_shogi_state';
 
+  function saveState() {
+    const data = {
+      board,
+      currentTurn,
+      handSente,
+      handGote,
+      lastMove,
+      history,
+      isGameOver
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function loadState() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return false;
+    try {
+      const data = JSON.parse(saved);
+      board = data.board;
+      currentTurn = data.currentTurn;
+      handSente = data.handSente;
+      handGote = data.handGote;
+      lastMove = data.lastMove;
+      history = data.history || [];
+      isGameOver = data.isGameOver || false;
+      return true;
+    } catch (e) {
+      console.error('Failed to load Shogi state:', e);
+      return false;
+    }
+  }
   function initHand() {
     return { 'R': 0, 'B': 0, 'G': 0, 'S': 0, 'N': 0, 'L': 0, 'P': 0 };
   }
@@ -501,7 +533,7 @@ window.ShogiGame = (() => {
         noticeEl.classList.remove('show');
       }
     }
-
+    saveState();
     render();
     updateMetaDisplay();
   }
@@ -635,12 +667,13 @@ window.ShogiGame = (() => {
       noticeEl.textContent = '';
       noticeEl.classList.remove('show');
     }
-
+    saveState();
     render();
     updateMetaDisplay();
   }
 
   function restart() {
+    localStorage.removeItem(STORAGE_KEY);
     board = cloneBoard(INITIAL_BOARD);
     currentTurn = 'sente';
     handSente = initHand();
@@ -785,7 +818,12 @@ window.ShogiGame = (() => {
   }
 
   function init() {
-    restart();
+    if (!loadState()) {
+      restart();
+    } else {
+      render();
+      updateMetaDisplay();
+    }
   }
 
   return {
