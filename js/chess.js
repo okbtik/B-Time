@@ -55,6 +55,44 @@ window.ChessGame = (() => {
   let enPassantTarget = null; // { r, c } or null
   let pendingPromotion = null; // Callback or data waiting for promotion choice
   let isGameOver = false;
+  // --- localStorage への自動保存と復元 ---
+  const STORAGE_KEY = 'btime_chess_state';
+
+  function saveState() {
+    const data = {
+      board,
+      currentTurn,
+      castlingRights,
+      enPassantTarget,
+      capturedWhite,
+      capturedBlack,
+      lastMove,
+      history,
+      isGameOver
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function loadState() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return false;
+    try {
+      const data = JSON.parse(saved);
+      board = data.board;
+      currentTurn = data.currentTurn;
+      castlingRights = data.castlingRights;
+      enPassantTarget = data.enPassantTarget;
+      capturedWhite = data.capturedWhite || [];
+      capturedBlack = data.capturedBlack || [];
+      lastMove = data.lastMove;
+      history = data.history || [];
+      isGameOver = data.isGameOver || false;
+      return true;
+    } catch (e) {
+      console.error('Failed to load Chess state:', e);
+      return false;
+    }
+  }
 
   // Helpers
   function isWhite(piece) {
@@ -158,8 +196,8 @@ window.ChessGame = (() => {
       // 1-step in any 8 directions
       const kingOffsets = [
         [-1, -1], [-1, 0], [-1, 1],
-        [0, -1],           [0, 1],
-        [1, -1],  [1, 0],  [1, 1]
+        [0, -1], [0, 1],
+        [1, -1], [1, 0], [1, 1]
       ];
       for (const [dr, dc] of kingOffsets) {
         addMove(r + dr, c + dc);
@@ -275,15 +313,15 @@ window.ChessGame = (() => {
       if (m.flag === 'castling-kingside') {
         const backRank = color === 'w' ? 7 : 0;
         if (isSquareAttacked(b, backRank, 4, opponent) ||
-            isSquareAttacked(b, backRank, 5, opponent) ||
-            isSquareAttacked(b, backRank, 6, opponent)) {
+          isSquareAttacked(b, backRank, 5, opponent) ||
+          isSquareAttacked(b, backRank, 6, opponent)) {
           continue;
         }
       } else if (m.flag === 'castling-queenside') {
         const backRank = color === 'w' ? 7 : 0;
         if (isSquareAttacked(b, backRank, 4, opponent) ||
-            isSquareAttacked(b, backRank, 3, opponent) ||
-            isSquareAttacked(b, backRank, 2, opponent)) {
+          isSquareAttacked(b, backRank, 3, opponent) ||
+          isSquareAttacked(b, backRank, 2, opponent)) {
           continue;
         }
       }
@@ -435,6 +473,7 @@ window.ChessGame = (() => {
       }
     }
 
+    saveState();
     render();
     updateMetaDisplay();
   }
@@ -541,13 +580,14 @@ window.ChessGame = (() => {
       noticeEl.textContent = '';
       noticeEl.classList.remove('show');
     }
-
+    saveState();
     render();
     updateMetaDisplay();
   }
 
   // Restart Game
   function restart() {
+    localStorage.removeItem(STORAGE_KEY);
     board = cloneBoard(INITIAL_BOARD);
     currentTurn = 'w';
     selectedSquare = null;
@@ -657,7 +697,12 @@ window.ChessGame = (() => {
 
   // Initialize
   function init() {
-    restart();
+    if (!loadState()) {
+      restart();
+    } else {
+      render();
+      updateMetaDisplay();
+    }
   }
 
   return {
