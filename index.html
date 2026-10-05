@@ -395,28 +395,25 @@
       };
     })();
 
+
     // Application Coordinator
     document.addEventListener('DOMContentLoaded', () => {
-      let currentGame = 'chess';
+      let currentGame = localStorage.getItem('btime_active_game') || 'chess';
       let isFlipped = false;
 
-      // Initialize all 3 games
+      // 各ゲームの初期化
       if (window.ChessGame) window.ChessGame.init();
       if (window.XiangqiGame) window.XiangqiGame.init();
       if (window.ShogiGame) window.ShogiGame.init();
 
-      // Tab switcher
+      // ★ tabs の宣言を switchGame の実行前に移動します
       const tabs = document.querySelectorAll('.game-nav .tab-btn');
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          const game = tab.dataset.game;
-          if (game === currentGame) return;
-          switchGame(game);
-        });
-      });
 
+      // タブ切替関数
       function switchGame(game) {
         currentGame = game;
+        localStorage.setItem('btime_active_game', game);
+
         tabs.forEach(t => t.classList.toggle('active', t.dataset.game === game));
 
         document.querySelectorAll('.game-container').forEach(c => {
@@ -425,12 +422,21 @@
         const targetContainer = document.getElementById(`game-${game}-container`);
         if (targetContainer) targetContainer.classList.add('active');
 
-        // Apply flip state if active
         syncFlipState();
-
-        // Update active game status in meta bar
         updateActiveGameMeta();
       }
+
+      // ★ 初期表示タブの反映（tabs 宣言後に呼び出します）
+      switchGame(currentGame);
+
+      // タブ切替のイベントリスナー設定
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const game = tab.dataset.game;
+          if (game === currentGame) return;
+          switchGame(game);
+        });
+      });
 
       function getActiveGameInstance() {
         if (currentGame === 'chess') return window.ChessGame;
@@ -498,7 +504,6 @@
         if (e.target === rulesModal) rulesModal.classList.add('hidden');
       });
 
-      // Keyboard shortcuts: 'u' for undo, 'f' for flip, 'r' for restart, 'Escape' for modals
       window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           rulesModal.classList.add('hidden');
@@ -507,7 +512,6 @@
         }
       });
 
-      // Initial meta update
       updateActiveGameMeta();
     });
   </script>
