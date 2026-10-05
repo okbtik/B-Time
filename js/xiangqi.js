@@ -43,7 +43,40 @@ window.XiangqiGame = (() => {
   let capturedBlack = [];
   let lastMove = null;
   let isGameOver = false;
+  // --- localStorage への自動保存と復元 ---
+  const STORAGE_KEY = 'btime_xiangqi_state';
 
+  function saveState() {
+    const data = {
+      board,
+      currentTurn,
+      capturedRed,
+      capturedBlack,
+      lastMove,
+      history,
+      isGameOver
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function loadState() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return false;
+    try {
+      const data = JSON.parse(saved);
+      board = data.board;
+      currentTurn = data.currentTurn;
+      capturedRed = data.capturedRed || [];
+      capturedBlack = data.capturedBlack || [];
+      lastMove = data.lastMove;
+      history = data.history || [];
+      isGameOver = data.isGameOver || false;
+      return true;
+    } catch (e) {
+      console.error('Failed to load Xiangqi state:', e);
+      return false;
+    }
+  }
   function inBounds(r, c) {
     return r >= 0 && r < ROWS && c >= 0 && c < COLS;
   }
@@ -363,7 +396,7 @@ window.XiangqiGame = (() => {
         noticeEl.classList.remove('show');
       }
     }
-
+    saveState();
     render();
     updateMetaDisplay();
   }
@@ -417,12 +450,13 @@ window.XiangqiGame = (() => {
       noticeEl.textContent = '';
       noticeEl.classList.remove('show');
     }
-
+    saveState();
     render();
     updateMetaDisplay();
   }
 
   function restart() {
+    localStorage.removeItem(STORAGE_KEY);
     board = cloneBoard(INITIAL_BOARD);
     currentTurn = 'r';
     selectedPoint = null;
@@ -521,7 +555,12 @@ window.XiangqiGame = (() => {
   }
 
   function init() {
-    restart();
+    if (!loadState()) {
+      restart();
+    } else {
+      render();
+      updateMetaDisplay();
+    }
   }
 
   return {
