@@ -308,35 +308,79 @@
   </div>
 
   <script>
-    // mp3 音声再生モジュール (window.SoundFx としてグローバルに公開)
+    // Web Audio API を使った遅延ゼロの音声再生モジュール
     window.SoundFx = (() => {
       let isMuted = false;
+      let audioCtx = null;
+      const audioBuffers = {};
 
-      // mp3 ファイルの読み込み
-      const audioMove = new Audio('sounds/move.mp3');
-      const audioCapture = new Audio('sounds/capture.mp3');
-      const audioCheck = new Audio('sounds/check.mp3');
-      const audioCheckmate = new Audio('sounds/checkmate.mp3');
+      const soundFiles = {
+        move: 'sounds/move.mp3',
+        capture: 'sounds/capture.mp3',
+        check: 'sounds/check.mp3',
+        checkmate: 'sounds/checkmate.mp3'
+      };
 
-      // 音量の設定 (0.0 ～ 1.0)
-      audioMove.volume = 1.0;
-      audioCapture.volume = 1.0;
-      audioCheck.volume = 1.0;
-      audioCheckmate.volume = 0.25;
+      const volumes = {
+        move: 1.0,
+        capture: 1.0,
+        check: 1.0,
+        checkmate: 0.25
+      };
 
-      // 読み込みエラー時のログ出力
-      [audioMove, audioCapture, audioCheck, audioCheckmate].forEach(audio => {
-        audio.addEventListener('error', () => {
-          console.error('音声ファイルの読み込みに失敗しました:', audio.src);
+      // AudioContext の初期化とファイルの事前ロード（メモリキャッシュ）
+      function initAudio() {
+        if (audioCtx) return;
+        const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtxClass) return;
+        audioCtx = new AudioCtxClass();
+
+        // 各 mp3 ファイルを非同期でダウンロードしてデコード（メモリに保持）
+        Object.keys(soundFiles).forEach(key => {
+          fetch(soundFiles[key])
+            .then(res => res.arrayBuffer())
+            .then(data => audioCtx.decodeAudioData(data))
+            .then(buffer => {
+              audioBuffers[key] = buffer;
+            })
+            .catch(err => console.error('Audio load error:', key, err));
         });
-      });
+      }
 
-      function playAudio(audio) {
-        if (isMuted || !audio) return;
-        audio.currentTime = 0;
-        audio.play().catch(err => {
-          console.warn('音声再生がブラウザにブロックされました:', err);
-        });
+      // スマホのロック解除用処理
+      function unlockAudio() {
+        initAudio();
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      }
+
+      // 最初の画面タップで音声メモリを初期化＆ロック解除
+      document.addEventListener('click', unlockAudio, { once: true });
+      document.addEventListener('touchstart', unlockAudio, { once: true });
+
+      // 即時再生関数
+      function play(key) {
+        if (isMuted) return;
+        unlockAudio();
+
+        if (!audioCtx || !audioBuffers[key]) return;
+
+        try {
+          // メモリ上の音声データから即座にノードを生成して再生（発話遅延なし）
+          const source = audioCtx.createBufferSource();
+          const gainNode = audioCtx.createGain();
+
+          source.buffer = audioBuffers[key];
+          gainNode.gain.value = volumes[key] !== undefined ? volumes[key] : 1.0;
+
+          source.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+
+          source.start(0);
+        } catch (e) {
+          console.warn('Audio play error:', e);
+        }
       }
 
       return {
@@ -350,18 +394,10 @@
           }
           return isMuted;
         },
-        playMove() {
-          playAudio(audioMove);
-        },
-        playCapture() {
-          playAudio(audioCapture);
-        },
-        playCheck() {
-          playAudio(audioCheck);
-        },
-        playCheckmate() {
-          playAudio(audioCheckmate);
-        }
+        playMove() { play('move'); },
+        playCapture() { play('capture'); },
+        playCheck() { play('check'); },
+        playCheckmate() { play('checkmate'); }
       };
     })();
 
