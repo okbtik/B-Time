@@ -79,6 +79,15 @@ body {
   overflow-x: hidden;
 }
 
+/* style.css に追加 */
+body,
+#board,
+.board-cell,
+.square {
+  /* ダブルタップズームを無効化し、タップイベントを即座に発火させる */
+  touch-action: manipulation;
+}
+
 /* App Container */
 .app-container {
   display: flex;
