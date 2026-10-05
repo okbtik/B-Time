@@ -380,6 +380,7 @@ window.XiangqiGame = (() => {
         isGameOver = true;
         noticeEl.textContent = `Checkmate! ${color === 'r' ? 'Red' : 'Black'} wins!`;
         noticeEl.classList.add('show');
+        if (window.SoundFx) window.SoundFx.playCheckmate();
       } else {
         noticeEl.textContent = 'Check!';
         noticeEl.classList.add('show');
@@ -391,6 +392,7 @@ window.XiangqiGame = (() => {
         isGameOver = true;
         noticeEl.textContent = `Stalemate! ${color === 'r' ? 'Red' : 'Black'} wins!`;
         noticeEl.classList.add('show');
+        if (window.SoundFx) window.SoundFx.playCheckmate();
       } else {
         noticeEl.textContent = '';
         noticeEl.classList.remove('show');

@@ -13,6 +13,8 @@
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Serif+JP:wght@600;700&family=Noto+Serif+SC:wght@600;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>♟</text></svg>">
 </head>
 
 <body>
@@ -61,10 +63,9 @@
           <svg id="sound-icon-off" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="1" y1="1" x2="23" y2="23"></line>
-            <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path>
+
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-            <line x1="23" y1="9" x2="17" y2="15"></line>
-            <line x1="17" y1="9" x2="23" y2="15"></line>
           </svg>
         </button>
         <button type="button" class="icon-btn" id="btn-rules" title="Game Rules & Guide" aria-label="Game Rules">
@@ -306,25 +307,36 @@
     </div>
   </div>
 
-  <!-- Audio Synthesizer & Game Scripts -->
-  <script src="js/chess.js"></script>
-  <script src="js/xiangqi.js"></script>
-  <script src="js/shogi.js"></script>
   <script>
-    // Audio synthesizer for crisp, satisfying mechanical board clicks
-    const SoundFx = (() => {
-      let audioCtx = null;
+    // mp3 音声再生モジュール (window.SoundFx としてグローバルに公開)
+    window.SoundFx = (() => {
       let isMuted = false;
 
-      function getContext() {
-        if (!audioCtx) {
-          const AudioContext = window.AudioContext || window.webkitAudioContext;
-          if (AudioContext) audioCtx = new AudioContext();
-        }
-        if (audioCtx && audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
-        return audioCtx;
+      // mp3 ファイルの読み込み
+      const audioMove = new Audio('sounds/move.mp3');
+      const audioCapture = new Audio('sounds/capture.mp3');
+      const audioCheck = new Audio('sounds/check.mp3');
+      const audioCheckmate = new Audio('sounds/checkmate.mp3');
+
+      // 音量の設定 (0.0 ～ 1.0)
+      audioMove.volume = 1.0;
+      audioCapture.volume = 1.0;
+      audioCheck.volume = 1.0;
+      audioCheckmate.volume = 0.25;
+
+      // 読み込みエラー時のログ出力
+      [audioMove, audioCapture, audioCheck, audioCheckmate].forEach(audio => {
+        audio.addEventListener('error', () => {
+          console.error('音声ファイルの読み込みに失敗しました:', audio.src);
+        });
+      });
+
+      function playAudio(audio) {
+        if (isMuted || !audio) return;
+        audio.currentTime = 0;
+        audio.play().catch(err => {
+          console.warn('音声再生がブラウザにブロックされました:', err);
+        });
       }
 
       return {
@@ -339,58 +351,16 @@
           return isMuted;
         },
         playMove() {
-          if (isMuted) return;
-          try {
-            const ctx = getContext();
-            if (!ctx) return;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(440, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + 0.06);
-            gain.gain.setValueAtTime(0.25, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.06);
-          } catch (e) { }
+          playAudio(audioMove);
         },
         playCapture() {
-          if (isMuted) return;
-          try {
-            const ctx = getContext();
-            if (!ctx) return;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(600, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.12);
-            gain.gain.setValueAtTime(0.35, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.12);
-          } catch (e) { }
+          playAudio(audioCapture);
         },
         playCheck() {
-          if (isMuted) return;
-          try {
-            const ctx = getContext();
-            if (!ctx) return;
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(520, ctx.currentTime);
-            osc.frequency.setValueAtTime(680, ctx.currentTime + 0.08);
-            gain.gain.setValueAtTime(0.2, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.22);
-          } catch (e) { }
+          playAudio(audioCheck);
+        },
+        playCheckmate() {
+          playAudio(audioCheckmate);
         }
       };
     })();
@@ -515,6 +485,10 @@
       updateActiveGameMeta();
     });
   </script>
+  <!-- Audio Synthesizer & Game Scripts -->
+  <script src="js/chess.js"></script>
+  <script src="js/xiangqi.js"></script>
+  <script src="js/shogi.js"></script>
 </body>
 
 </html>

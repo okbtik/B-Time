@@ -457,6 +457,7 @@ window.ChessGame = (() => {
         isGameOver = true;
         noticeEl.textContent = `Checkmate! ${color === 'w' ? 'White' : 'Black'} wins!`;
         noticeEl.classList.add('show');
+        if (window.SoundFx) window.SoundFx.playCheckmate();
       } else {
         noticeEl.textContent = 'Check!';
         noticeEl.classList.add('show');
@@ -467,6 +468,7 @@ window.ChessGame = (() => {
         isGameOver = true;
         noticeEl.textContent = 'Stalemate! Game is a draw.';
         noticeEl.classList.add('show');
+        if (window.SoundFx) window.SoundFx.playCheckmate();
       } else {
         noticeEl.textContent = '';
         noticeEl.classList.remove('show');

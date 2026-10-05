@@ -435,13 +435,11 @@ window.ShogiGame = (() => {
     return false;
   }
 
-  // Execute board move
   function makeBoardMove(from, to, promote = false) {
     const piece = board[from.r][from.c];
     const side = getSide(piece);
     const target = board[to.r][to.c];
 
-    // Snapshot history
     history.push({
       board: cloneBoard(board),
       currentTurn,
@@ -451,7 +449,6 @@ window.ShogiGame = (() => {
       isGameOver
     });
 
-    // Capture target
     if (target) {
       const rawBase = demotePiece(target).toUpperCase();
       if (side === 'sente') {
@@ -460,12 +457,11 @@ window.ShogiGame = (() => {
         const lowerKey = rawBase.toLowerCase();
         handGote[lowerKey] = (handGote[lowerKey] || 0) + 1;
       }
-      if (window.SoundFx) window.SoundFx.playCapture();
+      if (window.SoundFx) window.SoundFx.playCapture(); // ★コマ取り音
     } else {
-      if (window.SoundFx) window.SoundFx.playMove();
+      if (window.SoundFx) window.SoundFx.playMove(); // ★移動音
     }
 
-    // Place moved piece
     board[to.r][to.c] = promote ? promotePiece(piece) : piece;
     board[from.r][from.c] = '';
 
@@ -473,7 +469,6 @@ window.ShogiGame = (() => {
     finishTurn();
   }
 
-  // Execute piece drop
   function makeDropMove(pieceKey, to) {
     const side = currentTurn;
 
@@ -486,7 +481,6 @@ window.ShogiGame = (() => {
       isGameOver
     });
 
-    // Decrement from hand
     if (side === 'sente') {
       handSente[pieceKey.toUpperCase()]--;
     } else {
@@ -494,7 +488,8 @@ window.ShogiGame = (() => {
     }
 
     board[to.r][to.c] = side === 'sente' ? pieceKey.toUpperCase() : pieceKey.toLowerCase();
-    if (window.SoundFx) window.SoundFx.playMove();
+
+    if (window.SoundFx) window.SoundFx.playMove(); // ★駒打ち音
 
     lastMove = { from: 'drop', to, piece: board[to.r][to.c] };
     finishTurn();
@@ -518,21 +513,24 @@ window.ShogiGame = (() => {
         isGameOver = true;
         noticeEl.textContent = `Checkmate! ${prevSide === 'sente' ? 'Sente' : 'Gote'} wins!`;
         noticeEl.classList.add('show');
+        if (window.SoundFx) window.SoundFx.playCheckmate(); // ★詰み音 (音量25%)
       } else {
         noticeEl.textContent = 'Check!';
         noticeEl.classList.add('show');
-        if (window.SoundFx) window.SoundFx.playCheck();
+        if (window.SoundFx) window.SoundFx.playCheck(); // ★王手音
       }
     } else {
       if (!hasLegal) {
         isGameOver = true;
         noticeEl.textContent = `Checkmate! ${prevSide === 'sente' ? 'Sente' : 'Gote'} wins!`;
         noticeEl.classList.add('show');
+        if (window.SoundFx) window.SoundFx.playCheckmate(); // ★ステイルメート/詰み音 (音量25%)
       } else {
         noticeEl.textContent = '';
         noticeEl.classList.remove('show');
       }
     }
+
     saveState();
     render();
     updateMetaDisplay();
